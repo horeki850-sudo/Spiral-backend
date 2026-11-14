@@ -19,7 +19,27 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::apiResource('categories', CategoryController::class);
-Route::apiResource('products', ProductController::class);
+// PRODUCT ROUTES - AUTHENTICATED USERS
+Route::middleware('auth:sanctum')->group(function () {
+
+    // Both normal users and admins can view products
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/products/{product}', [ProductController::class, 'show']);
+
+    // Only admins can manage products
+    Route::middleware('admin')->group(function () {
+        Route::post('/products', [ProductController::class, 'store']);
+
+        Route::match(['put', 'patch'], '/products/{product}', [
+            ProductController::class, 'update'
+        ]);
+
+        Route::delete('/products/{product}', [
+            ProductController::class, 'destroy'
+        ]);
+    });
+
+});
 Route::apiResource('carts', CartController::class);
 Route::apiResource('cart-items', CartItemController::class);
 Route::apiResource('reviews', ReviewController::class);

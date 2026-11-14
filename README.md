@@ -1,58 +1,168 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Spiral Store – Backend API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Project Description
 
-## About Laravel
+Spiral Store is an e-commerce REST API developed using Laravel. It provides product management, user authentication, and role-based authorization using Laravel Sanctum.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The API allows authenticated users to view products while restricting product creation, updating, and deletion to administrators.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Technologies Used
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP
+- Laravel
+- MySQL
+- Laravel Sanctum
+- REST API
+- Composer
 
-## Learning Laravel
+## Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Authentication
+- User registration
+- User login
+- User logout
+- Password hashing
+- Token-based authentication using Laravel Sanctum
+- Token revocation upon logout
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Authorization
+- Admin and normal user roles
+- Authentication middleware
+- Admin middleware
+- Protected API routes
+- Unauthorized guest requests return HTTP 401
+- Restricted user actions return HTTP 403
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### Product Management
+- Retrieve all products
+- Retrieve a specific product
+- Create products (Admin only)
+- Update products (Admin only)
+- Delete products (Admin only)
 
-## Agentic Development
+## API Endpoints
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### Authentication
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/register` | Register a new user |
+| POST | `/api/login` | Login |
+| POST | `/api/logout` | Logout and revoke token |
+
+### Products
+
+| Method | Endpoint | Access |
+|---|---|---|
+| GET | `/api/products` | Authenticated users |
+| GET | `/api/products/{product}` | Authenticated users |
+| POST | `/api/products` | Admin only |
+| PUT/PATCH | `/api/products/{product}` | Admin only |
+| DELETE | `/api/products/{product}` | Admin only |
+
+Protected endpoints require a valid Sanctum bearer token.
+
+## Installation and Setup
+
+### 1. Clone the Repository
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/horeki850-sudo/Spiral-backend.git
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Open the Project Folder
 
-## Contributing
+```bash
+cd Spiral-backend
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 3. Install Dependencies
 
-## Code of Conduct
+```bash
+composer install
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 4. Configure Environment
 
-## Security Vulnerabilities
+Copy `.env.example` to `.env` and configure your database connection.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Example MySQL configuration:
 
-## License
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=ecommerce_db
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Use your own database credentials if they are different.
+
+### 5. Generate Application Key
+
+```bash
+php artisan key:generate
+```
+
+### 6. Run Database Migrations
+
+```bash
+php artisan migrate
+```
+
+### 7. Start the Laravel Server
+
+```bash
+php artisan serve
+```
+
+Default API base URL:
+
+`http://127.0.0.1:8000/api`
+
+## User Roles
+
+| Role | Permissions |
+|---|---|
+| Admin | View, create, update, and delete products |
+| Normal User | View products and product details |
+| Guest | Cannot access protected product endpoints |
+
+Newly registered users receive the default `user` role. Administrator privileges must be assigned through an authorized administrative process.
+
+## Security
+
+- Passwords are hashed before storage.
+- Password hashes are not included in API responses.
+- Authentication uses Laravel Sanctum personal access tokens.
+- Logout revokes the current access token.
+- Admin middleware restricts product management operations.
+- User registration does not allow public role assignment.
+
+## Testing Results
+
+The following authorization and CRUD tests were performed:
+
+| Test | Expected Result |
+|---|---|
+| Guest accesses products | 401 Unauthorized |
+| Normal user views products | 200 OK |
+| Normal user creates product | 403 Forbidden |
+| Normal user updates product | 403 Forbidden |
+| Normal user deletes product | 403 Forbidden |
+| Admin creates product | 201 Created |
+| Admin updates product | 200 OK |
+| Admin deletes product | 200 OK |
+
+## Frontend Repository
+
+https://github.com/horeki850-sudo/Spiral-frontend
+
+## Backend Repository
+
+https://github.com/horeki850-sudo/Spiral-backend
+
+## Developers
+
+Developed as part of the Activity 8 requirements for authentication, authorization, and GitHub collaboration.
