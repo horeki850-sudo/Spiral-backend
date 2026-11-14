@@ -166,3 +166,26 @@ https://github.com/horeki850-sudo/Spiral-backend
 ## Developers
 
 Developed as part of the Activity 8 requirements for authentication, authorization, and GitHub collaboration.
+## API Authentication and Authorization
+
+This API uses Laravel Sanctum for token-based authentication.
+
+### Authentication Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/register` | Register a new user |
+| POST | `/api/login` | Log in and receive an authentication token |
+| POST | `/api/logout` | Log out and revoke the current token |
+
+### Access Control
+
+- Guests cannot access protected product endpoints.
+- Authenticated users can view products.
+- Only users with the admin role can create, update, or delete products.
+- Unauthorized requests return HTTP 401.
+- Authenticated users without admin permission receive HTTP 403.
+
+### Authorization Middleware
+
+Product management routes use the `auth:sanctum` and `admin` middleware to protect administrative operations.
